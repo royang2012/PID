@@ -32,9 +32,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity Register18 is
-    Port ( DATA_IN : in STD_LOGIC_VECTOR (17 downto 0);
-           INIT_IN : in STD_LOGIC_VECTOR (17 downto 0);
-           DATA_OUT : out STD_LOGIC_VECTOR (17 downto 0);
+    Port ( DATA_IN : in STD_LOGIC_VECTOR (13 downto 0);
+           INIT_IN : in STD_LOGIC_VECTOR (13 downto 0);
+           DATA_OUT : out STD_LOGIC_VECTOR (13 downto 0);
            CLK : in STD_LOGIC;
            RST  :in STD_LOGIC;
            CE : in STD_LOGIC);

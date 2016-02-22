@@ -1,4 +1,4 @@
--- (c) Copyright 1995-2015 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1995-2016 Xilinx, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
 -- of Xilinx, Inc. and is protected under U.S. and
@@ -54,12 +54,12 @@
 ------------- Begin Cut here for COMPONENT Declaration ------ COMP_TAG
 COMPONENT Subtractor18
   PORT (
-    A : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
-    B : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+    A : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
+    B : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
     CLK : IN STD_LOGIC;
     CE : IN STD_LOGIC;
     SINIT : IN STD_LOGIC;
-    S : OUT STD_LOGIC_VECTOR(17 DOWNTO 0)
+    S : OUT STD_LOGIC_VECTOR(13 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------

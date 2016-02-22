@@ -1,4 +1,4 @@
--- (c) Copyright 1995-2015 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1995-2016 Xilinx, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
 -- of Xilinx, Inc. and is protected under U.S. and
@@ -55,10 +55,10 @@
 COMPONENT mult18_10
   PORT (
     CLK : IN STD_LOGIC;
-    A : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+    A : IN STD_LOGIC_VECTOR(13 DOWNTO 0);
     B : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
     CE : IN STD_LOGIC;
-    P : OUT STD_LOGIC_VECTOR(27 DOWNTO 0)
+    P : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
   );
 END COMPONENT;
 -- COMP_TAG_END ------ End COMPONENT Declaration ------------

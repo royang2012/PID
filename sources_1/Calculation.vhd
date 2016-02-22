@@ -101,73 +101,72 @@ signal s_counter: STD_LOGIC_VECTOR(5 DOWNTO 0);
 
 signal range_sw :STD_LOGIC_VECTOR(1 DOWNTO 0);
 -- PID feedback calculation signals
-signal V_Input  : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0'); -- Input register
+signal V_Input  : STD_LOGIC_VECTOR(12 DOWNTO 0):=(others=>'0'); -- Input register
 signal P_Input  : STD_LOGIC_VECTOR(11 DOWNTO 0):=(others=>'0'); -- Input register
-signal V_PID    : STD_LOGIC_VECTOR(27 DOWNTO 0);    -- Output Voltage
-signal V_PIDreg : STD_LOGIC_VECTOR(27 DOWNTO 0);    -- Output Voltage
-signal V_PIDR   : STD_LOGIC_VECTOR(27 DOWNTO 0);    -- Output Register
+signal V_PID    : STD_LOGIC_VECTOR(25 DOWNTO 0);    -- Output Voltage
+signal V_PIDreg : STD_LOGIC_VECTOR(25 DOWNTO 0);    -- Output Voltage
+signal V_PIDR   : STD_LOGIC_VECTOR(25 DOWNTO 0);    -- Output Register
 signal P_SQUARE : STD_LOGIC_VECTOR(23 DOWNTO 0);
 signal P_LOG    : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
-signal ERROR    : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0');
-signal ERRORreg : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0'); 
-signal ERRORreg1 : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0'); 
+signal ERROR    : STD_LOGIC_VECTOR(13 DOWNTO 0):=(others=>'0');
+signal ERRORreg : STD_LOGIC_VECTOR(13 DOWNTO 0):=(others=>'0'); 
 
-signal E_1      : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0');
-signal E_1reg   : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0');        
-signal ERRORB0  : STD_LOGIC_VECTOR(27 DOWNTO 0):=(others=>'0');
-signal ERRORB0reg: STD_LOGIC_VECTOR(27 DOWNTO 0):=(others=>'0');
-signal E_1B1    : STD_LOGIC_VECTOR(27 DOWNTO 0):=(others=>'0');
-signal E_1B1reg : STD_LOGIC_VECTOR(27 DOWNTO 0):=(others=>'0');
-signal SUM      : STD_LOGIC_VECTOR(27 DOWNTO 0);
-signal SUMreg   : STD_LOGIC_VECTOR(27 DOWNTO 0);
+signal E_1      : STD_LOGIC_VECTOR(13 DOWNTO 0):=(others=>'0');
+signal E_1reg   : STD_LOGIC_VECTOR(13 DOWNTO 0):=(others=>'0');        
+signal ERRORB0  : STD_LOGIC_VECTOR(23 DOWNTO 0):=(others=>'0');
+signal ERRORB0reg: STD_LOGIC_VECTOR(23 DOWNTO 0):=(others=>'0');
+signal E_1B1    : STD_LOGIC_VECTOR(23 DOWNTO 0):=(others=>'0');
+signal E_1B1reg : STD_LOGIC_VECTOR(23 DOWNTO 0):=(others=>'0');
+signal SUM      : STD_LOGIC_VECTOR(24 DOWNTO 0);
+signal SUMreg   : STD_LOGIC_VECTOR(24 DOWNTO 0);
 
 signal X_OUTreg : STD_LOGIC_VECTOR(15 DOWNTO 0);
-signal V_REF    : STD_LOGIC_VECTOR(17 DOWNTO 0) := "001000000000000000";    -- Reference V
-signal V_MAX  : STD_LOGIC_VECTOR(27 DOWNTO 0) := "0001111111111111111000000000"; -- Threshold value for V
-constant V_REFO : STD_LOGIC_VECTOR(27 DOWNTO 0) := "0000001111111111111100000000";    -- Reference V
-constant V_REFE : STD_LOGIC_VECTOR(17 DOWNTO 0) := "000000000000000000";
+signal V_REF    : STD_LOGIC_VECTOR(12 DOWNTO 0) := "0010000000000";    -- Reference V
+signal V_MAX  : STD_LOGIC_VECTOR(25 DOWNTO 0) := "00011111111111111110000000"; -- Threshold value for V
+constant V_REFO : STD_LOGIC_VECTOR(25 DOWNTO 0) := "00000011111111111111000000";    -- Reference V
+constant V_REFE : STD_LOGIC_VECTOR(13 DOWNTO 0) := "00000000000000";
 
 
 -- log signals
 
-
+signal logv_in  : STD_LOGIC_VECTOR(15 downto 0);
 signal logp     : STD_LOGIC_VECTOR(14 downto 0);
 signal logv     : STD_LOGIC_VECTOR(14 downto 0);
 
 
 COMPONENT Subtractor18
   PORT (
-    A : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
-    B : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+    A : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
+    B : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
     CLK : IN STD_LOGIC;
     CE : IN STD_LOGIC;
     SINIT : IN STD_LOGIC;
-    S : OUT STD_LOGIC_VECTOR(17 DOWNTO 0)
+    S : OUT STD_LOGIC_VECTOR(13 DOWNTO 0)
   );
 end component;
 COMPONENT subtractor_out
     PORT (
-      A : IN STD_LOGIC_VECTOR(27 DOWNTO 0);
-      B : IN STD_LOGIC_VECTOR(27 DOWNTO 0);
+      A : IN STD_LOGIC_VECTOR(25 DOWNTO 0);
+      B : IN STD_LOGIC_VECTOR(24 DOWNTO 0);
       CLK : IN STD_LOGIC;
       CE : IN STD_LOGIC;
       SINIT : IN STD_LOGIC;
-      S : OUT STD_LOGIC_VECTOR(27 DOWNTO 0)
+      S : OUT STD_LOGIC_VECTOR(25 DOWNTO 0)
     );
 END COMPONENT;
 component Register18
-    Port ( DATA_IN : in STD_LOGIC_VECTOR (17 downto 0);
-           INIT_IN : in STD_LOGIC_VECTOR (17 downto 0);
-           DATA_OUT : out STD_LOGIC_VECTOR (17 downto 0);
+    Port ( DATA_IN : in STD_LOGIC_VECTOR (13 downto 0);
+           INIT_IN : in STD_LOGIC_VECTOR (13 downto 0);
+           DATA_OUT : out STD_LOGIC_VECTOR (13 downto 0);
            CLK : in STD_LOGIC;
            RST  :in STD_LOGIC;
            CE : in STD_LOGIC);
 end component;
 component Register28
-    Port ( DATA_IN : in STD_LOGIC_VECTOR (27 downto 0);
-           INIT_IN : in STD_LOGIC_VECTOR (27 downto 0);
-           DATA_OUT : out STD_LOGIC_VECTOR (27 downto 0);
+    Port ( DATA_IN : in STD_LOGIC_VECTOR (25 downto 0);
+           INIT_IN : in STD_LOGIC_VECTOR (25 downto 0);
+           DATA_OUT : out STD_LOGIC_VECTOR (25 downto 0);
            CLK : in STD_LOGIC;
            RST  :in STD_LOGIC;
            CE : in STD_LOGIC);
@@ -175,19 +174,19 @@ end component;
 COMPONENT mult18_10
   PORT (
     CLK : IN STD_LOGIC;
-    A : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+    A : IN STD_LOGIC_VECTOR(13 DOWNTO 0);
     B : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
     CE : IN STD_LOGIC;
-    P : OUT STD_LOGIC_VECTOR(27 DOWNTO 0)
+    P : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
   );
 END COMPONENT;
 COMPONENT add28_28
   PORT (
-    A : IN STD_LOGIC_VECTOR(27 DOWNTO 0);
-    B : IN STD_LOGIC_VECTOR(27 DOWNTO 0);
+    A : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
+    B : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
     CLK : IN STD_LOGIC;
     CE : IN STD_LOGIC;
-    S : OUT STD_LOGIC_VECTOR(27 DOWNTO 0)
+    S : OUT STD_LOGIC_VECTOR(24 DOWNTO 0)
   );
 END COMPONENT;
 COMPONENT mul_16_16
@@ -291,7 +290,7 @@ done_signal: process(RST, CLK,en_cal)
 --              and be outputed.
 ----------------------------------------------------------------------------------- 
 
-    V_Input(16 downto 5) <= DATA_IN;
+    V_Input(11 downto 0) <= DATA_IN;
   
 --    output_pro: process(RST, CLK, en_cal,FIX_SW)
 --    begin
@@ -327,7 +326,7 @@ done_signal: process(RST, CLK,en_cal)
                 else
                     DATA_OUT <= "1111111111111111";
                 end if;                  
-            else DATA_OUT <= V_PID(24 DOWNTO 9); 
+            else DATA_OUT <= V_PID(22 DOWNTO 7); 
             end if;
         end if;                   
     end process;    
@@ -341,7 +340,7 @@ done_signal: process(RST, CLK,en_cal)
                 X_OUT <= X_OUTreg;
             elsif OUT_SW = '1' then
                 X_OUT <= DATA_IN&"0000";
-            else X_OUT <=  V_PID(24 DOWNTO 9); 
+            else X_OUT <=  V_PID(22 DOWNTO 7); 
             end if;
         end if;                   
     end process;
@@ -354,7 +353,7 @@ done_signal: process(RST, CLK,en_cal)
     v_ref_selection: process(CLK)
     begin
         if rising_edge(CLK) then
-            V_REF <= "0"&sw1&"00000000000000";
+            V_REF <= "0"&sw1&"000000000";
         end if;        
     end process;
 
@@ -366,9 +365,9 @@ done_signal: process(RST, CLK,en_cal)
 -----------------------------------------------------------------------------------
     range_sw <= TRE_SW&RAM_SW; 
     with range_sw select V_MAX <=
-        "000"&MAX_IN&"1111000000000"      when "10",
-        "0001111111111111111000000000"      when "00",
-        "0000011111111111111000000000"  when others;
+        "000"&MAX_IN&"11110000000"      when "10",
+        "00011111111111111110000000"      when "00",
+        "00000111111111111110000000"  when others;
 
 -----------------------------------------------------------------------------------
 --
@@ -429,10 +428,12 @@ done_signal: process(RST, CLK,en_cal)
         if RST = '1' then
             V_PID <= V_REFO;
         elsif rising_edge(CLK) then
-            if V_PIDreg(27) = '1' then
+            if V_PIDreg(25) = '1' then
                 V_PID <= (others=>'0');
-            elsif V_PIDreg(25) = '1' then
+            elsif V_PIDreg(24) = '1' then
                 V_PID <= V_MAX;
+            elsif V_PIDreg(23) = '1' then
+                    V_PID <= V_MAX;                
             elsif V_PIDreg > V_MAX then
                 V_PID <= V_MAX;
             else V_PID <= V_PIDreg;                
@@ -482,14 +483,15 @@ done_signal: process(RST, CLK,en_cal)
 --              
 -----------------------------------------------------------------------------------   
     slog: log1215 port map(
-        V_Input(16 downto 5),
+        V_Input(11 downto 0),
         logv);
     plog: log1215 port map(
         P_LOG,
         logp);   
+    logv_in <= '1'&logv;
     xoutsubtraction: xoutsub
           PORT MAP (
-            '1'&logv,
+            logv_in,
             logp,
             CLK,
             en_cal,

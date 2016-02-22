@@ -1,4 +1,4 @@
--- (c) Copyright 1995-2015 Xilinx, Inc. All rights reserved.
+-- (c) Copyright 1995-2016 Xilinx, Inc. All rights reserved.
 -- 
 -- This file contains confidential and proprietary information
 -- of Xilinx, Inc. and is protected under U.S. and
@@ -58,12 +58,12 @@ USE c_addsub_v12_0.c_addsub_v12_0;
 
 ENTITY Subtractor18 IS
   PORT (
-    A : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
-    B : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+    A : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
+    B : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
     CLK : IN STD_LOGIC;
     CE : IN STD_LOGIC;
     SINIT : IN STD_LOGIC;
-    S : OUT STD_LOGIC_VECTOR(17 DOWNTO 0)
+    S : OUT STD_LOGIC_VECTOR(13 DOWNTO 0)
   );
 END Subtractor18;
 
@@ -101,8 +101,8 @@ ARCHITECTURE Subtractor18_arch OF Subtractor18 IS
       C_HAS_SINIT : INTEGER
     );
     PORT (
-      A : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
-      B : IN STD_LOGIC_VECTOR(17 DOWNTO 0);
+      A : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
+      B : IN STD_LOGIC_VECTOR(12 DOWNTO 0);
       CLK : IN STD_LOGIC;
       ADD : IN STD_LOGIC;
       C_IN : IN STD_LOGIC;
@@ -112,7 +112,7 @@ ARCHITECTURE Subtractor18_arch OF Subtractor18 IS
       SSET : IN STD_LOGIC;
       SINIT : IN STD_LOGIC;
       C_OUT : OUT STD_LOGIC;
-      S : OUT STD_LOGIC_VECTOR(17 DOWNTO 0)
+      S : OUT STD_LOGIC_VECTOR(13 DOWNTO 0)
     );
   END COMPONENT c_addsub_v12_0;
   ATTRIBUTE X_CORE_INFO : STRING;
@@ -120,7 +120,7 @@ ARCHITECTURE Subtractor18_arch OF Subtractor18 IS
   ATTRIBUTE CHECK_LICENSE_TYPE : STRING;
   ATTRIBUTE CHECK_LICENSE_TYPE OF Subtractor18_arch : ARCHITECTURE IS "Subtractor18,c_addsub_v12_0,{}";
   ATTRIBUTE CORE_GENERATION_INFO : STRING;
-  ATTRIBUTE CORE_GENERATION_INFO OF Subtractor18_arch: ARCHITECTURE IS "Subtractor18,c_addsub_v12_0,{x_ipProduct=Vivado 2015.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=c_addsub,x_ipVersion=12.0,x_ipCoreRevision=6,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL,C_VERBOSITY=0,C_XDEVICEFAMILY=artix7,C_IMPLEMENTATION=0,C_A_WIDTH=18,C_B_WIDTH=18,C_OUT_WIDTH=18,C_CE_OVERRIDES_SCLR=0,C_A_TYPE=0,C_B_TYPE=0,C_LATENCY=1,C_ADD_MODE=1,C_B_CONSTANT=0,C_B_VALUE=000000000000000000,C_AINIT_VAL=0,C_SINIT_VAL=0,C_CE_OVERRIDES_BYPASS=1,C_BYPASS_LOW=0,C_SCLR_OVERRIDES_SSET=1,C_HAS_C_IN=0,C_HAS_C_OUT=0,C_BORROW_LOW=1,C_HAS_CE=1,C_HAS_BYPASS=0,C_HAS_SCLR=0,C_HAS_SSET=0,C_HAS_SINIT=1}";
+  ATTRIBUTE CORE_GENERATION_INFO OF Subtractor18_arch: ARCHITECTURE IS "Subtractor18,c_addsub_v12_0,{x_ipProduct=Vivado 2015.1,x_ipVendor=xilinx.com,x_ipLibrary=ip,x_ipName=c_addsub,x_ipVersion=12.0,x_ipCoreRevision=6,x_ipLanguage=VHDL,x_ipSimLanguage=VHDL,C_VERBOSITY=0,C_XDEVICEFAMILY=artix7,C_IMPLEMENTATION=0,C_A_WIDTH=13,C_B_WIDTH=13,C_OUT_WIDTH=14,C_CE_OVERRIDES_SCLR=0,C_A_TYPE=0,C_B_TYPE=0,C_LATENCY=1,C_ADD_MODE=1,C_B_CONSTANT=0,C_B_VALUE=0000000000000,C_AINIT_VAL=0,C_SINIT_VAL=0,C_CE_OVERRIDES_BYPASS=1,C_BYPASS_LOW=0,C_SCLR_OVERRIDES_SSET=1,C_HAS_C_IN=0,C_HAS_C_OUT=0,C_BORROW_LOW=1,C_HAS_CE=1,C_HAS_BYPASS=0,C_HAS_SCLR=0,C_HAS_SSET=0,C_HAS_SINIT=1}";
   ATTRIBUTE X_INTERFACE_INFO : STRING;
   ATTRIBUTE X_INTERFACE_INFO OF A: SIGNAL IS "xilinx.com:signal:data:1.0 a_intf DATA";
   ATTRIBUTE X_INTERFACE_INFO OF B: SIGNAL IS "xilinx.com:signal:data:1.0 b_intf DATA";
@@ -134,16 +134,16 @@ BEGIN
       C_VERBOSITY => 0,
       C_XDEVICEFAMILY => "artix7",
       C_IMPLEMENTATION => 0,
-      C_A_WIDTH => 18,
-      C_B_WIDTH => 18,
-      C_OUT_WIDTH => 18,
+      C_A_WIDTH => 13,
+      C_B_WIDTH => 13,
+      C_OUT_WIDTH => 14,
       C_CE_OVERRIDES_SCLR => 0,
       C_A_TYPE => 0,
       C_B_TYPE => 0,
       C_LATENCY => 1,
       C_ADD_MODE => 1,
       C_B_CONSTANT => 0,
-      C_B_VALUE => "000000000000000000",
+      C_B_VALUE => "0000000000000",
       C_AINIT_VAL => "0",
       C_SINIT_VAL => "0",
       C_CE_OVERRIDES_BYPASS => 1,

@@ -54,6 +54,7 @@
 --                  OUT_SW is adapted to 1 bits
 --                  Change the arrangement of first 5 switches.    
 --                  Duplicate all LUT signals                 
+--          9.4 Changed the bit allocation of calculation signals
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
@@ -472,7 +473,7 @@ begin
 --              states, the display will just show "test".
 --
 ----------------------------------------------------------------------------------- 
-display_assignment: process(RST, CLK, en_assign,BTN,START,TEST_MD)
+display_assignment: process(RST, CLK, en_assign,BTN,START,TEST_MD,counter1,counter2,counter3)
     begin
        if (RST = '1') then
            display1 <= "11111";
