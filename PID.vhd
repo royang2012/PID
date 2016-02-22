@@ -41,6 +41,10 @@
 --              Added V_PIDreg to the sensitivity list. 
 --          8.1 Now during the LUT gen process, address will hault at 0 for a while
 --              to wait for the response of EOM.
+--          8.5 Instead of calculating P^2, now log(S) - 2*log(P) is calculated. To
+--              do this, log1215 is replaced by log1214, which generates a 14bit 
+--              log output. Then, log(P) is left shifted by 1bit, and "11"is added 
+--              to log(S).
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
@@ -256,6 +260,8 @@ signal start_da3    : std_logic;
 signal done_da3     : std_logic;
 signal done_da3x    : std_logic;
 signal done_cal     : std_logic;
+-- control signal for LUT generation
+signal en_lut       : std_logic;
 -- control signals for value assignment
 signal en_assign    : std_logic;
 -- control signals for calculation
@@ -634,11 +640,19 @@ OUTPUT_DECODE: process (current_state)
 --              Finally, the LUT ADC state initiate the DA Conversion, en_write is
 --              1 at rising edge of done_ad1 and input_data is written into the ram.           
 ----------------------------------------------------------------------------------- 
-    LUT_cyc: process(RST, done_da3, LUT_SW)
+    LUT_enable: process(RST, CLK, LUT_SW)
+    begin
+        if RST = '1' then
+            en_lut <= '0';
+        elsif rising_edge(CLK) then
+            en_lut <= LUT_SW;
+        end if;
+    end process;
+    LUT_cyc: process(RST, done_da3, en_lut)
     begin
         if RST = '1' then
             lut_counter <= "0000000";
-        elsif LUT_SW = '1' then
+        elsif en_lut = '1' then
             if rising_edge(done_da3) then
                 lut_counter <= lut_counter + '1';
             end if;
@@ -646,12 +660,12 @@ OUTPUT_DECODE: process (current_state)
         end if;
     end process;
 
-    counter_incre: process(LUT_SW, RST, done_ad1, lut_counter)
+    counter_incre: process(en_lut, RST, done_ad1, lut_counter)
     begin
         if RST = '1' then
             address_s <= "000000000000000";
             zero_pause <= '0';
-        elsif LUT_SW = '1' then            
+        elsif en_lut = '1' then            
             if lut_counter = "1111111" then
                 if falling_edge(done_ad1) then
                     address_s <= address_s + '1';
@@ -663,11 +677,11 @@ OUTPUT_DECODE: process (current_state)
         end if;
     end process;
     
-    address_assign: process(RST, LUT_SW, address_s, zero_pause, start_ad1,output_data)
+    address_assign: process(RST, en_lut, address_s, zero_pause, start_ad1,output_data)
     begin
         if RST = '1' then
             address <= x"0000";
-        elsif LUT_SW = '1' then
+        elsif en_lut = '1' then
             if zero_pause = '0' then
                 address <= '0'&address_s;
             else address <= x"0000";
@@ -678,37 +692,37 @@ OUTPUT_DECODE: process (current_state)
         end if;        
     end process;
     
-    with LUT_SW select dac_data <=
+    with en_lut select dac_data <=
         output_data when '0',
         address      when '1';
 
-    with LUT_SW select xdac_data <=
+    with en_lut select xdac_data <=
         x_data when '0',
         ramout&"0000"   when '1';
                 
     led<=xdac_data;
 
             
-    write_ram: process(LUT_SW, done_ad1)
+    write_ram: process(en_lut, done_ad1)
     begin
-        if LUT_SW = '1' then
+        if en_lut = '1' then
             en_write(0) <= done_ad1;
         else en_write <= "0";
         end if;
     end process;
     
-    power_assign: process(LUT_SW,done_ad1)
+    power_assign: process(en_lut,done_ad1)
     begin
-        if LUT_SW = '1' then
+        if en_lut = '1' then
             if rising_edge(done_ad1) then
                 ramin <= input_data;
             end if;
         end if;
     end process;
     
-    power_lookup: process(LUT_SW, ramout)
+    power_lookup: process(en_lut, ramout)
     begin
-        if LUT_SW = '0' then
+        if en_lut = '0' then
             p_data <= ramout;
         end if;
     end process;                
@@ -722,7 +736,7 @@ OUTPUT_DECODE: process (current_state)
 --              depending on the current state and the input signals.
 --    
 -----------------------------------------------------------------------------------    
-    NEXT_STATE_DECODE: process (current_state, START, MODE_SW, done_ad1, done_cal, done_da3, done_rd, LUT_SW)
+    NEXT_STATE_DECODE: process (current_state, START, MODE_SW, done_ad1, done_cal, done_da3, done_rd, en_lut)
     begin      
       next_state <= current_state;  -- default is to stay in current state     
       case (current_state) is
@@ -731,7 +745,7 @@ OUTPUT_DECODE: process (current_state)
                 next_state <= ADConversion;
             elsif MODE_SW = '1' then
                 next_state <= ValueAssign;
-            elsif LUT_SW = '1' then
+            elsif en_lut = '1' then
                 next_state <= LUTDA;
             end if;
          when ValueAssign =>
@@ -760,7 +774,7 @@ OUTPUT_DECODE: process (current_state)
             end if;        
          when LUTAD =>
             if rising_edge(done_ad1) then
-                if LUT_SW = '1' then   
+                if en_lut = '1' then   
                     next_state <= LUTDA;
                 else
                     next_state <= Idle;

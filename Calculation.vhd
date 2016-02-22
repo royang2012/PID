@@ -104,7 +104,6 @@ signal V_PID    : STD_LOGIC_VECTOR(27 DOWNTO 0);    -- Output Voltage
 signal V_PIDreg : STD_LOGIC_VECTOR(27 DOWNTO 0);    -- Output Voltage
 signal V_PIDR   : STD_LOGIC_VECTOR(27 DOWNTO 0);    -- Output Register
 signal P_SQUARE : STD_LOGIC_VECTOR(23 DOWNTO 0);
-signal P_LOG    : STD_LOGIC_VECTOR(11 DOWNTO 0);
 
 signal ERROR    : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0');
 signal ERRORreg : STD_LOGIC_VECTOR(17 DOWNTO 0):=(others=>'0'); 
@@ -128,8 +127,11 @@ constant V_REFE : STD_LOGIC_VECTOR(17 DOWNTO 0) := "000000000000000000";
 
 
 -- log signals
-signal logv     : STD_LOGIC_VECTOR(14 downto 0);
+
+signal P_LOG    : STD_LOGIC_VECTOR(13 DOWNTO 0);
+signal V_LOG    : STD_LOGIC_VECTOR(13 DOWNTO 0);
 signal logp     : STD_LOGIC_VECTOR(14 downto 0);
+signal logv     : STD_LOGIC_VECTOR(15 downto 0);
 
 
 COMPONENT Subtractor18
@@ -186,17 +188,9 @@ COMPONENT add28_28
     S : OUT STD_LOGIC_VECTOR(27 DOWNTO 0)
   );
 END COMPONENT;
-COMPONENT mul_16_16
-  PORT (
-    CLK : IN STD_LOGIC;
-    A : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-    B : IN STD_LOGIC_VECTOR(11 DOWNTO 0);
-    P : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
-  );
-END COMPONENT;
-COMPONENT log1215 is
+COMPONENT log1214 is
     Port ( LOG_IN : in STD_LOGIC_VECTOR (11 downto 0);
-           LOG_OUT : out STD_LOGIC_VECTOR (14 downto 0));
+           LOG_OUT : out STD_LOGIC_VECTOR (13 downto 0));
 end COMPONENT;
 COMPONENT xoutsub
   PORT (
@@ -332,7 +326,7 @@ done_signal: process(RST, CLK,en_cal)
             elsif OUT_SW = "100" then
                 X_OUT <= DATA_IN&"0000";
             elsif OUT_SW = "010" then
-                    X_OUT <= P_LOG&"0000";     
+                    X_OUT <= P_LOG&"00";     
             elsif OUT_SW = "001" then
                     X_OUT <= V_PID(24 DOWNTO 9);
             else X_OUT <= logp&'0';
@@ -438,21 +432,7 @@ done_signal: process(RST, CLK,en_cal)
 --
 -- Description: Calculate the florescence density X. In the normal florescence case
 --              X = S/P, in the two photo case, X = S/P^2. 
------------------------------------------------------------------------------------
-
-    with TRE_SW select P_Input <=
-        P_IN(10 downto 0)&P_IN(11)      when '1',
-        P_IN     when '0';    
---    P_Input <= P_IN;
-    p_sq: mul_16_16 PORT MAP (CLK, 
-                              P_Input,
-                              P_Input,
-                              P_SQUARE);
-                              
-    with TEST_MD select P_LOG <=
-        P_Input                  when '0',
-        P_SQUARE(23 downto 12)   when '1';
-
+-----------------------------------------------------------------------------------                           
 -----------------------------------------------------------------------------------
 --
 -- Title      : Division Calculation
@@ -473,15 +453,21 @@ done_signal: process(RST, CLK,en_cal)
 --              division starts at rising edge of en_cal at takes 26 clock cycles.
 --              
 -----------------------------------------------------------------------------------   
-    slog: log1215 port map(
+
+    P_Input <= P_IN;
+    slog: log1214 port map(
         V_Input(16 downto 5),
-        logv);
-    plog: log1215 port map(
-        P_LOG,
-        logp);    
+        V_LOG);
+    plog: log1214 port map(
+        P_Input,
+        P_LOG);    
+    with TEST_MD select logp <=
+        "0"&P_LOG   when '0',
+        P_LOG&"0"   when '1';
+    logv <= "11"&V_LOG;
     xoutsubtraction: xoutsub
           PORT MAP (
-            '1'&logv,
+            logv,
             logp,
             CLK,
             en_cal,
